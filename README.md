@@ -1,5 +1,5 @@
 # Gitlab Registry Garbage Collector
-Exclude old image tags registered in the Gitlab Registry.
+Delete automatically old image tags registered in your Gitlab Registry.
 
 The default `CONFIG_FILE` path set in the Docker image is `/var/grgc/config.yaml`.
 
