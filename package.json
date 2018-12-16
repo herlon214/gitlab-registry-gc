@@ -1,0 +1,31 @@
+{
+  "name": "gitlab-registry-gc",
+  "version": "1.0.0",
+  "description": "Gitlab registry garbage collector",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "DEBUG=grgc node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/herlon214/gitlab-registry-gc"
+  },
+  "keywords": [
+    "gitlab",
+    "registry",
+    "garbage collector"
+  ],
+  "author": "Herlon Aguiar",
+  "license": "ISC",
+  "dependencies": {
+    "awaity": "^1.0.0",
+    "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2",
+    "cron": "^1.6.0",
+    "debug": "^4.1.0",
+    "js-yaml": "^3.12.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5"
+  }
+}
