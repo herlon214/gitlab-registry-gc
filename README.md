@@ -27,6 +27,8 @@ grgc 3 image tags deleted for [yourworkspace/projectC] +0ms
 ### Configuration file
 Example of `config.yaml`, setup:
 ```yaml
+rootUrl: https://gitlab.com # Default
+
 # This is not available in the Gitlab api, so we need to
 # login using your username and password
 username: youruser

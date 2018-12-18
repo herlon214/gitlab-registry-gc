@@ -11,6 +11,12 @@ const { CONFIG_FILE } = process.env
 if (!CONFIG_FILE) throw new Error('CONFIG_FILE not set in env.')
 const config = yaml.safeLoad(fs.readFileSync(CONFIG_FILE).toString())
 
+if (!config.rootUrl) {
+  config.rootUrl = 'https://gitlab.com'
+}
+
+const { rootUrl } = config
+
 const request = _request.defaults({
   jar: true,
   simple: false,
@@ -19,10 +25,10 @@ const request = _request.defaults({
   }
 })
 
-const filterUrl = (url) => url.replace('https://gitlab.com/', '')
+const filterUrl = (url) => url.replace(rootUrl, '')
 
 const endpoints = {
-  signIn: 'https://gitlab.com/users/sign_in'
+  signIn: `${rootUrl}/users/sign_in`
 }
 
 const loadTags = async (path) => {
@@ -68,7 +74,7 @@ async function checkForProject (project) {
   const token = getCSRF(projectPage)
 
   const registryInfo = await request.get(project + '/container_registry.json', { json: true })
-  const tags = await loadTags('https://gitlab.com' + registryInfo[0].tags_path)
+  const tags = await loadTags(rootUrl + registryInfo[0].tags_path)
   const willBeDeleted = []
 
   if (tags.length > config.garbage.max_entries) {
@@ -86,14 +92,14 @@ async function checkForProject (project) {
   if (willBeDeleted.length > 0) {
     debug(`Deleting old image tags...`)
     const deleted = await mapLimit(willBeDeleted, async (tag) => {
-      const item = await request.delete('https://gitlab.com' + tag.destroy_path, {
+      const item = await request.delete(rootUrl + tag.destroy_path, {
         headers: {
           'X-CSRF-Token': token,
           'Referer': project + '/container_registry',
           'X-Requested-With': 'XMLHttpRequest',
           'Content-Type': 'application/json;charset=utf-8',
           'Accept': 'application/json, text/plain, */*',
-          'Origin': 'https://gitlab.com'
+          'Origin': rootUrl
         }
       })
 
