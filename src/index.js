@@ -47,7 +47,7 @@ const loadTags = async (path) => {
   // Exclude tags specified (including wildcards like feature*)
   result = result.filter(item => {
       return config.garbage.exclude.filter(name => {
-        return isMatch(item, name)
+        return isMatch(item.name, name)
       }).length === 0;
   });
 
