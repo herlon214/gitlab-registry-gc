@@ -74,18 +74,20 @@ async function checkForProject (project) {
   const token = getCSRF(projectPage)
 
   const registryInfo = await request.get(project + '/container_registry.json', { json: true })
-  const tags = await loadTags(rootUrl + registryInfo[0].tags_path)
-  const willBeDeleted = []
+  let willBeDeleted = []
+  for (regInfo of registryInfo) {
+    let tags = await loadTags(rootUrl + regInfo.tags_path)
+  
+    if (tags.length > config.garbage.max_entries) {
+      debug(`Found ${tags.length} images for [${regInfo.path}], ${tags.length - config.garbage.max_entries} higher than the limit`)
+    } else {
+      debug(`Found ${tags.length} images for [${regInfo.path}]`)
+    }
 
-  if (tags.length > config.garbage.max_entries) {
-    debug(`Found ${tags.length} images for [${name}], ${tags.length - config.garbage.max_entries} higher than the limit`)
-  } else {
-    debug(`Found ${tags.length} images for [${name}]`)
-  }
-
-  // Insert the old images into the array to be deleted
-  while (tags.length > config.garbage.max_entries) {
-    willBeDeleted.push(tags.pop())
+    // Insert the old images into the array to be deleted
+    while (tags.length > config.garbage.max_entries) {
+      willBeDeleted.push(tags.pop())
+    }
   }
 
   // Check if need to delete image tags
@@ -104,10 +106,10 @@ async function checkForProject (project) {
       })
 
       if (item.length === 0) {
-        debug(`[DELETED] ${tag.destroy_path}`)
+        debug(`[DELETED] ${tag.location}`)
       } else {
         console.log(item)
-        debug(`[FAILED] ${tag.destroy_path}`)
+        debug(`[FAILED] ${tag.location}`)
       }
 
       return item
