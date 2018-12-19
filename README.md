@@ -39,7 +39,9 @@ garbage:
   max_entries: 5 # Max image tags you want to keep
   check_period: "* * * * *" # Cron job format for period check
   order: DESC # Order to keep tags, e.g: DESC will keep the recently created
-  exclude: # If you want to prevent some tag to be deleted, you can use wildcards
+  # If you want to prevent some tag to be deleted, you can use wildcards
+  # you can use all micromatch (https://www.npmjs.com/package/micromatch) patterns
+  exclude:
     - master
     - develop.*
     - latest

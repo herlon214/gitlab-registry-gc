@@ -5,6 +5,7 @@ const _request = require('request-promise-native')
 const debug = require('debug')('grgc')
 const { map, mapLimit } = require('awaity')
 const { CronJob } = require('cron')
+const { isMatch } = require('micromatch')
 
 // Load yaml
 const { CONFIG_FILE } = process.env
@@ -46,12 +47,7 @@ const loadTags = async (path) => {
   // Exclude tags specified (including wildcards like feature*)
   result = result.filter(item => {
       return config.garbage.exclude.filter(name => {
-          if(name.endsWith("*")) {
-              name = name.slice(0,-1);
-              return item.name.indexOf(name) > -1;
-          } else {
-              return name === item.name;
-          }
+        return isMatch(item, name)
       }).length === 0;
   });
 
