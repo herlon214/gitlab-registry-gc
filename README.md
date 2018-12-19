@@ -39,9 +39,9 @@ garbage:
   max_entries: 5 # Max image tags you want to keep
   check_period: "* * * * *" # Cron job format for period check
   order: DESC # Order to keep tags, e.g: DESC will keep the recently created
-  exclude: # If you want to prevent some tag to be deleted
+  exclude: # If you want to prevent some tag to be deleted, you can use wildcards
     - master
-    - develop
+    - develop.*
     - latest
 
 projects: # You need at least developer permission in each project
