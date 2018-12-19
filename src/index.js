@@ -43,10 +43,17 @@ const loadTags = async (path) => {
     i++
   }
 
-  // Exclude tags specified
+  // Exclude tags specified (including wildcards like feature*)
   result = result.filter(item => {
-    return config.garbage.exclude.filter(name => name === item.name).length === 0
-  })
+      return config.garbage.exclude.filter(name => {
+          if(name.endsWith("*")) {
+              name = name.slice(0,-1);
+              return item.name.indexOf(name) > -1;
+          } else {
+              return name === item.name;
+          }
+      }).length === 0;
+  });
 
   // Order the results
   result = result.sort((a, b) => {
