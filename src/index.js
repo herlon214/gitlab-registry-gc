@@ -43,10 +43,17 @@ const loadTags = async (path) => {
     i++
   }
 
-  // Exclude tags specified
+  // Exclude tags specified (including wildcards like feature*)
   result = result.filter(item => {
-    return config.garbage.exclude.filter(name => name === item.name).length === 0
-  })
+      return config.garbage.exclude.filter(name => {
+          if(name.endsWith("*")) {
+              name = name.slice(0,-1);
+              return item.name.indexOf(name) > -1;
+          } else {
+              return name === item.name;
+          }
+      }).length === 0;
+  });
 
   // Order the results
   result = result.sort((a, b) => {
@@ -74,18 +81,20 @@ async function checkForProject (project) {
   const token = getCSRF(projectPage)
 
   const registryInfo = await request.get(project + '/container_registry.json', { json: true })
-  const tags = await loadTags(rootUrl + registryInfo[0].tags_path)
-  const willBeDeleted = []
+  let willBeDeleted = []
+  for (regInfo of registryInfo) {
+    let tags = await loadTags(rootUrl + regInfo.tags_path)
+  
+    if (tags.length > config.garbage.max_entries) {
+      debug(`Found ${tags.length} images for [${regInfo.path}], ${tags.length - config.garbage.max_entries} higher than the limit`)
+    } else {
+      debug(`Found ${tags.length} images for [${regInfo.path}]`)
+    }
 
-  if (tags.length > config.garbage.max_entries) {
-    debug(`Found ${tags.length} images for [${name}], ${tags.length - config.garbage.max_entries} higher than the limit`)
-  } else {
-    debug(`Found ${tags.length} images for [${name}]`)
-  }
-
-  // Insert the old images into the array to be deleted
-  while (tags.length > config.garbage.max_entries) {
-    willBeDeleted.push(tags.pop())
+    // Insert the old images into the array to be deleted
+    while (tags.length > config.garbage.max_entries) {
+      willBeDeleted.push(tags.pop())
+    }
   }
 
   // Check if need to delete image tags
@@ -104,10 +113,10 @@ async function checkForProject (project) {
       })
 
       if (item.length === 0) {
-        debug(`[DELETED] ${tag.destroy_path}`)
+        debug(`[DELETED] ${tag.location}`)
       } else {
         console.log(item)
-        debug(`[FAILED] ${tag.destroy_path}`)
+        debug(`[FAILED] ${tag.location}`)
       }
 
       return item
