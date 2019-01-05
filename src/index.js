@@ -46,10 +46,10 @@ const loadTags = async (path) => {
 
   // Exclude tags specified (including wildcards like feature*)
   result = result.filter(item => {
-      return config.garbage.exclude.filter(name => {
-        return isMatch(item.name, name)
-      }).length === 0;
-  });
+    return config.garbage.exclude.filter(name => {
+      return isMatch(item.name, name)
+    }).length === 0
+  })
 
   // Order the results
   result = result.sort((a, b) => {
