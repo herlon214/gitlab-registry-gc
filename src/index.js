@@ -78,9 +78,9 @@ async function checkForProject (project) {
 
   const registryInfo = await request.get(project + '/container_registry.json', { json: true })
   let willBeDeleted = []
-  for (regInfo of registryInfo) {
+  for (let regInfo of registryInfo) {
     let tags = await loadTags(rootUrl + regInfo.tags_path)
-  
+
     if (tags.length > config.garbage.max_entries) {
       debug(`Found ${tags.length} images for [${regInfo.path}], ${tags.length - config.garbage.max_entries} higher than the limit`)
     } else {
